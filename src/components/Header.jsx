@@ -22,7 +22,13 @@ const Header = ({ timeStep, simulationTime, fireCount, paused, autoStep, onPause
     <header className="app-header">
       <div className="header-left">
         <div className="logo">
-          <span className="logo-icon">🔥</span>
+          <div className="logo-icon-wrapper">
+            <svg className="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
           <div className="logo-text">
             <h1>Fire Evacuation System</h1>
             <p>Real-Time Simulation & Route Planning</p>
@@ -33,9 +39,10 @@ const Header = ({ timeStep, simulationTime, fireCount, paused, autoStep, onPause
       <div className="header-center">
         <div className="status-indicators">
           <div className="status-item">
-            <span className="status-icon">⏱️</span>
-            <span className="status-label">Simulation Time</span>
-            <span className="status-value">{formatSimulationTime(simulationTime || 0)}</span>
+            <div className="status-content">
+              <span className="status-label">Simulation Time</span>
+              <span className="status-value">{formatSimulationTime(simulationTime || 0)}</span>
+            </div>
             <div className="time-progress-bar">
               <div 
                 className="time-progress-fill" 
@@ -43,22 +50,23 @@ const Header = ({ timeStep, simulationTime, fireCount, paused, autoStep, onPause
               />
             </div>
           </div>
+          <div className="status-divider"></div>
           <div className="status-item">
-            <span className="status-icon">🔄</span>
             <span className="status-label">Step</span>
             <span className="status-value">{timeStep}</span>
           </div>
+          <div className="status-divider"></div>
           <div className="status-item danger">
-            <span className="status-icon">🔥</span>
             <span className="status-label">Active Fires</span>
             <span className="status-value">{fireCount}</span>
           </div>
+          <div className="status-divider"></div>
           <div className={`status-item ${paused ? 'paused' : 'running'}`}>
-            <span className="status-icon">{paused ? '⏸️' : '▶️'}</span>
             <span className="status-label">{paused ? 'Paused' : 'Running'}</span>
+            <div className={`status-indicator-dot ${paused ? 'paused' : 'running'}`}></div>
           </div>
+          <div className="status-divider"></div>
           <div className="status-item speed-control">
-            <span className="status-icon">⚡</span>
             <span className="status-label">Speed</span>
             <div className="speed-selector">
               <button
@@ -97,11 +105,12 @@ const Header = ({ timeStep, simulationTime, fireCount, paused, autoStep, onPause
       <div className="header-right">
         <div className="header-controls">
           <button 
-            className={`control-btn ${paused ? 'paused' : ''}`}
+            className={`control-btn primary ${paused ? 'paused' : ''}`}
             onClick={onPause}
             title="Pause/Resume (Space)"
           >
-            {paused ? '▶ Resume' : '⏸ Pause'}
+            <span className="btn-icon">{paused ? '▶' : '⏸'}</span>
+            <span className="btn-text">{paused ? 'Resume' : 'Pause'}</span>
           </button>
           <button 
             className="control-btn"
@@ -109,28 +118,33 @@ const Header = ({ timeStep, simulationTime, fireCount, paused, autoStep, onPause
             title="Next Step (N)"
             disabled={!paused && autoStep}
           >
-            ⏭ Step
+            <span className="btn-icon">⏭</span>
+            <span className="btn-text">Step</span>
           </button>
           <button 
             className={`control-btn ${autoStep ? 'active' : ''}`}
             onClick={onToggleAuto}
             title="Toggle Auto Mode (A)"
           >
-            {autoStep ? '🔄 Auto' : '⏸ Manual'}
+            <span className="btn-icon">↻</span>
+            <span className="btn-text">{autoStep ? 'Auto' : 'Manual'}</span>
           </button>
+          <div className="control-divider"></div>
           <button 
             className="control-btn secondary"
             onClick={onReset}
             title="Reset Simulation"
           >
-            🔄 Reset
+            <span className="btn-icon">↻</span>
+            <span className="btn-text">Reset</span>
           </button>
           <button 
             className="control-btn secondary"
             onClick={onSettings}
             title="Settings"
           >
-            ⚙️ Settings
+            <span className="btn-icon">⚙</span>
+            <span className="btn-text">Settings</span>
           </button>
         </div>
       </div>

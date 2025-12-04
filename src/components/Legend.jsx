@@ -11,16 +11,16 @@ const Legend = () => {
   ]
 
   const hazardItems = [
-    { icon: '🔥', label: 'Fire Detected', color: '#FF4444' },
-    { icon: '💨', label: 'High CO (>50ppm)', color: '#AA4444' },
-    { icon: '⚠️', label: 'O2 Cylinder Risk', color: '#FF8800' },
-    { icon: '👥', label: 'High Crowd Density', color: '#FFA500' },
-    { icon: '🚫', label: 'Blocked Exit', color: '#FF0000' },
+    { symbol: 'F', label: 'Fire Detected', color: '#FF4444' },
+    { symbol: 'CO', label: 'High CO (>50ppm)', color: '#AA4444' },
+    { symbol: 'O2', label: 'O2 Cylinder Risk', color: '#FF8800' },
+    { symbol: 'C', label: 'High Crowd Density', color: '#FFA500' },
+    { symbol: 'X', label: 'Blocked Exit', color: '#FF0000' },
   ]
 
   return (
     <div className="legend-panel">
-      <h3 className="legend-title">🗺️ Map Legend</h3>
+      <h3 className="legend-title">Map Legend</h3>
       
       <div className="legend-section">
         <h4 className="legend-section-title">Danger Levels</h4>
@@ -45,8 +45,17 @@ const Legend = () => {
         <div className="legend-items">
           {hazardItems.map((item, idx) => (
             <div key={idx} className="legend-item">
-              <div className="legend-icon" style={{ color: item.color }}>
-                {item.icon}
+              <div className="legend-icon" style={{ 
+                color: item.color,
+                backgroundColor: item.color + '20',
+                border: `1px solid ${item.color}40`,
+                borderRadius: '4px',
+                padding: '2px 6px',
+                fontSize: '10px',
+                fontWeight: '600',
+                fontFamily: 'monospace'
+              }}>
+                {item.symbol}
               </div>
               <div className="legend-label">{item.label}</div>
             </div>

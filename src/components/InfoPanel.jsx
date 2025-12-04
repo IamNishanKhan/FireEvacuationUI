@@ -48,7 +48,7 @@ const InfoPanel = ({
               color: routeChanged ? COLORS.RED : COLORS.DARK_GREEN,
               animation: routeChanged ? 'flash 0.5s ease-in-out 3' : 'none'
             }}>
-              {routeChanged ? '⚠️ ROUTE CHANGED!' : 'RECOMMENDED ROUTE'}
+              {routeChanged ? 'ROUTE CHANGED' : 'RECOMMENDED ROUTE'}
             </h2>
             <div className="route-info">
               <div style={{ fontWeight: 'bold', fontSize: '16px' }}>Exit: {recommended.exit}</div>
@@ -111,17 +111,17 @@ const InfoPanel = ({
                 </div>
               </div>
               <div style={{ marginTop: '10px', color: recommended.risk.passable ? COLORS.GREEN : COLORS.RED, fontWeight: 'bold' }}>
-                Status: {recommended.risk.passable ? '✓ PASSABLE' : '✗ BLOCKED'}
+                Status: {recommended.risk.passable ? 'PASSABLE' : 'BLOCKED'}
               </div>
               <div style={{ marginTop: '10px' }}>
                 {recommended.risk.hasFire && (
-                  <div style={{ color: COLORS.RED, fontWeight: 'bold', fontSize: '14px' }}>⚠️ FIRE DETECTED!</div>
+                  <div style={{ color: COLORS.RED, fontWeight: 'bold', fontSize: '13px' }}>FIRE DETECTED</div>
                 )}
                 {recommended.risk.hasOxygenHazard && (
-                  <div style={{ color: COLORS.ORANGE, fontWeight: 'bold', fontSize: '14px' }}>⚠️ O2 EXPLOSION RISK</div>
+                  <div style={{ color: COLORS.ORANGE, fontWeight: 'bold', fontSize: '13px' }}>O2 EXPLOSION RISK</div>
                 )}
                 {!recommended.risk.hasFire && !recommended.risk.hasOxygenHazard && (
-                  <div style={{ color: COLORS.GREEN, fontSize: '12px' }}>✓ No critical hazards</div>
+                  <div style={{ color: COLORS.GREEN, fontSize: '12px' }}>No critical hazards</div>
                 )}
               </div>
             </div>
@@ -151,11 +151,11 @@ const InfoPanel = ({
                 border: isRec ? `2px solid ${COLORS.GREEN}` : '1px solid transparent'
               }}>
                 <div style={{ color, fontWeight: 'bold', fontSize: '14px' }}>
-                  Route {idx + 1}: {route.exit} {isRec && '⭐ [RECOMMENDED]'}
+                  Route {idx + 1}: {route.exit} {isRec && '[RECOMMENDED]'}
                 </div>
                 <div style={{ fontSize: '12px', marginTop: '4px' }}>
                   <span style={{ color: route.risk.passable ? COLORS.GREEN : COLORS.RED, fontWeight: 'bold' }}>
-                    {route.risk.passable ? '✓ PASSABLE' : '✗ BLOCKED'}
+                    {route.risk.passable ? 'PASSABLE' : 'BLOCKED'}
                   </span>
                   {' | '}
                   <span style={{ color: COLORS.RED }}>Danger: {route.risk.avgDanger.toFixed(1)}</span>
@@ -164,8 +164,8 @@ const InfoPanel = ({
                 </div>
                 {(route.risk.hasFire || route.risk.hasOxygenHazard) && (
                   <div style={{ fontSize: '11px', marginTop: '4px' }}>
-                    {route.risk.hasFire && <span style={{ color: COLORS.RED }}>🔥 Fire </span>}
-                    {route.risk.hasOxygenHazard && <span style={{ color: COLORS.ORANGE }}>⚠️ O2 Risk</span>}
+                    {route.risk.hasFire && <span style={{ color: COLORS.RED }}>Fire </span>}
+                    {route.risk.hasOxygenHazard && <span style={{ color: COLORS.ORANGE }}>O2 Risk</span>}
                   </div>
                 )}
               </div>

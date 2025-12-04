@@ -480,13 +480,13 @@ function App() {
       setEvacuationProgress(0)
     }
     
-    // Animation speed based on settings
+    // Animation speed based on settings (slower for better visibility)
     const speedMap = {
-      slow: 0.005,
-      normal: 0.01,
-      fast: 0.02
+      slow: 0.0015,
+      normal: 0.003,
+      fast: 0.006
     }
-    const progressPerFrame = speedMap[settings.animationSpeed] || 0.01
+    const progressPerFrame = speedMap[settings.animationSpeed] || 0.003
     
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current)
@@ -623,6 +623,19 @@ function App() {
         </div>
         
         <div className="sidebar">
+          <InfoPanel
+            timeStep={timeStep}
+            simulationTime={simulationTime}
+            fireCount={fireCount}
+            routes={routes}
+            recommended={recommended}
+            paused={paused}
+            autoStep={autoStep}
+            routeChanged={routeChanged}
+            evacuationProgress={evacuationProgress}
+            simulationHistory={simulationHistory}
+          />
+
           <StatisticsPanel
             sensors={sensors}
             routes={routes}
@@ -636,19 +649,6 @@ function App() {
           />
           
           <Legend />
-          
-        <InfoPanel
-          timeStep={timeStep}
-          simulationTime={simulationTime}
-          fireCount={fireCount}
-          routes={routes}
-          recommended={recommended}
-          paused={paused}
-          autoStep={autoStep}
-          routeChanged={routeChanged}
-          evacuationProgress={evacuationProgress}
-          simulationHistory={simulationHistory}
-        />
         </div>
       </div>
       

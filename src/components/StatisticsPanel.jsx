@@ -45,7 +45,7 @@ const StatisticsPanel = ({ sensors, routes, recommended, timeStep }) => {
 
   return (
     <div className="statistics-panel">
-      <h2 className="panel-title">📊 Statistics</h2>
+      <h2 className="panel-title">Statistics</h2>
       
       <div className="stats-grid">
         <StatCard

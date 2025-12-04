@@ -13,7 +13,7 @@ const TimeChart = ({ simulationHistory, simulationTime }) => {
 
   return (
     <div className="time-chart">
-      <h3 className="chart-title">📈 Simulation Timeline (2 min)</h3>
+      <h3 className="chart-title">Simulation Timeline</h3>
       <div className="chart-container">
         <svg width={chartWidth} height={chartHeight} className="chart-svg">
           {/* Grid lines */}

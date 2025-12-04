@@ -4,18 +4,20 @@
   display: flex;
   align-items: flex-start; /* anchor content at top */
   justify-content: center;
-  overflow: auto;
+  overflow: hidden; /* Prevent default scrolling - we handle pan/zoom */
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   position: relative;
-  padding-top: 40px; /* inner top spacing below header */
+  padding-top: 0; /* remove extra band above the main area */
+  user-select: none; /* Prevent text selection while panning */
 }
 
 canvas {
   display: block;
-  cursor: default;
+  cursor: inherit; /* Inherit cursor from container */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  margin: 20px;
+  margin: 0; /* remove outer whitespace around the main area */
   background: #FFFFFF;
+  pointer-events: none; /* Let container handle mouse events */
 }
 

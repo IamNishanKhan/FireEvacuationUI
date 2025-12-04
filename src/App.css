@@ -1,15 +1,19 @@
 :root {
-  --header-height: 70px;
+  --header-height: 72px;
   --content-gap: 0px; /* use 0; add inner padding in scroll area instead */
 }
 
-.app {
+ .app {
   width: 100vw;
   min-height: 100vh;
-  padding-top: calc(var(--header-height) + var(--content-gap)); /* offset + extra gap */
+  padding-top: calc(var(--header-height) + var(--content-gap));
   display: flex;
   flex-direction: column;
-  background: radial-gradient(circle at top left, #0f172a 0, #111827 35%, #020617 70%, #020617 100%);
+  /* Softer, more neutral background that puts focus on the map */
+  background:
+    radial-gradient(circle at top left, #1f2937 0, rgba(15, 23, 42, 0.9) 30%, rgba(15, 23, 42, 1) 60%),
+    radial-gradient(circle at bottom right, #0f172a 0, #020617 55%);
+  color: #e5e7eb;
   overflow: hidden;
 }
 
@@ -18,31 +22,34 @@
   width: 100%;
   height: calc(100vh - var(--header-height) - var(--content-gap));
   overflow: hidden;
-  gap: 16px;
-  padding: 16px 16px 24px;
+  gap: 20px;
+  padding: 18px 20px 26px;
   box-sizing: border-box;
 }
 
 .canvas-wrapper {
   flex: 1;
   position: relative;
-  background: transparent;
+  background: radial-gradient(circle at top left, #e5f2ff 0, #f3f4f6 40%, #e5e7eb 100%);
   overflow: hidden;
-  border-radius: 16px;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.6);
+  border-radius: 18px;
+  box-shadow:
+    0 22px 55px rgba(15, 23, 42, 0.65),
+    0 0 0 1px rgba(148, 163, 184, 0.35);
 }
 
 .sidebar {
-  width: 380px;
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(18px);
+  width: 390px;
+  max-width: 32%;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.4), rgba(30, 41, 59, 0.2));
   overflow-y: auto;
   overflow-x: hidden;
-  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  padding: 12px 12px 16px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+  gap: 16px;
+  padding: 16px;
+  backdrop-filter: blur(20px);
+  border-left: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .controls-overlay {
@@ -83,6 +90,49 @@
   color: #FFFFFF;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.5px;
+}
+
+/* Responsive tweaks */
+@media (max-width: 1200px) {
+  .sidebar {
+    width: 360px;
+    max-width: 40%;
+  }
+}
+
+@media (max-width: 992px) {
+  .app {
+    padding-top: var(--header-height);
+  }
+
+  .main-container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .canvas-wrapper {
+    min-height: 380px;
+  }
+
+  .sidebar {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-container {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .canvas-wrapper {
+    border-radius: 14px;
+  }
+
+  .sidebar {
+    padding: 0;
+  }
 }
 
 @keyframes flash-alert {
