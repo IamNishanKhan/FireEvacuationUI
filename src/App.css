@@ -1,0 +1,98 @@
+:root {
+  --header-height: 70px;
+  --content-gap: 0px; /* use 0; add inner padding in scroll area instead */
+}
+
+.app {
+  width: 100vw;
+  min-height: 100vh;
+  padding-top: calc(var(--header-height) + var(--content-gap)); /* offset + extra gap */
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(circle at top left, #0f172a 0, #111827 35%, #020617 70%, #020617 100%);
+  overflow: hidden;
+}
+
+.main-container {
+  display: flex;
+  width: 100%;
+  height: calc(100vh - var(--header-height) - var(--content-gap));
+  overflow: hidden;
+  gap: 16px;
+  padding: 16px 16px 24px;
+  box-sizing: border-box;
+}
+
+.canvas-wrapper {
+  flex: 1;
+  position: relative;
+  background: transparent;
+  overflow: hidden;
+  border-radius: 16px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.6);
+}
+
+.sidebar {
+  width: 380px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(18px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 12px 16px;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+}
+
+.controls-overlay {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.control-hint {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+}
+
+.route-change-alert {
+  position: absolute;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(255, 0, 0, 0.5);
+  z-index: 1001;
+  animation: flash-alert 0.5s ease-in-out 3;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.alert-text {
+  font-size: 18px;
+  font-weight: 700;
+  color: #FFFFFF;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.5px;
+}
+
+@keyframes flash-alert {
+  0%, 100% { 
+    opacity: 1; 
+    transform: translateX(-50%) scale(1); 
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: translateX(-50%) scale(1.05); 
+  }
+}
+

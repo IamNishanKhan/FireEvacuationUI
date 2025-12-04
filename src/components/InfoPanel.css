@@ -1,0 +1,146 @@
+.info-panel {
+  flex: 1;
+  background-color: white;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 16px;
+}
+
+.panel-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e3c72;
+  margin: 0 0 8px 0;
+}
+
+.panel-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.panel-divider {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 8px 0;
+}
+
+.section-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 12px 0;
+  color: #1e3c72;
+}
+
+.section-label {
+  font-size: 14px;
+  font-weight: bold;
+  margin: 5px 0;
+}
+
+.llm-section {
+  margin: 10px 0;
+}
+
+.llm-answer-section,
+.llm-reasoning-section {
+  margin: 10px 0;
+}
+
+.llm-text {
+  font-size: 12px;
+  color: #000000;
+  margin: 5px 0;
+  padding: 0 5px;
+  word-wrap: break-word;
+}
+
+.reasoning-text {
+  margin: 5px 0;
+  padding: 0 5px;
+}
+
+.fire-status {
+  background: #fff5f5;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 4px solid #FF4444;
+}
+
+.status-label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #FF4444;
+}
+
+.recommended-section {
+  background: #f0f9ff;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #44AA44;
+  margin: 8px 0;
+}
+
+.route-info {
+  font-size: 13px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.route-path {
+  font-size: 12px;
+  color: #333;
+  margin: 5px 0;
+  word-break: break-all;
+}
+
+.no-route-section {
+  margin: 20px 0;
+  text-align: center;
+}
+
+.all-routes-section {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin: 8px 0;
+}
+
+.route-item {
+  margin: 8px 0;
+  padding: 5px;
+  font-size: 14px;
+}
+
+.controls-section {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: auto;
+  border-top: 2px solid #e0e0e0;
+}
+
+.control-item {
+  font-size: 12px;
+  margin: 4px 0;
+  color: #333;
+  padding: 4px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.control-item:last-child {
+  border-bottom: none;
+}
+
+@keyframes flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
