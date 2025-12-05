@@ -40,8 +40,8 @@ const Header = ({ timeStep, simulationTime, fireCount, paused, autoStep, onPause
         <div className="status-indicators">
           <div className="status-item">
             <div className="status-content">
-              <span className="status-label">Simulation Time</span>
-              <span className="status-value">{formatSimulationTime(simulationTime || 0)}</span>
+            <span className="status-label">Simulation Time</span>
+            <span className="status-value">{formatSimulationTime(simulationTime || 0)}</span>
             </div>
             <div className="time-progress-bar">
               <div 

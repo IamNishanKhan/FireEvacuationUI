@@ -3,19 +3,19 @@ import './Legend.css'
 
 const Legend = () => {
   const legendItems = [
-    { color: '#ADD8E6', label: 'Safe (0-20)', description: 'Low danger level' },
-    { color: '#FFFFE0', label: 'Moderate (20-40)', description: 'Moderate danger' },
-    { color: '#FFA500', label: 'High (40-60)', description: 'High danger' },
-    { color: '#FF0000', label: 'Critical (60+)', description: 'Extremely dangerous' },
-    { color: '#00FF00', label: 'Exit', description: 'Evacuation exit' },
+    { color: '#E8F5E9', label: 'Safe (0-20)', description: 'Low danger level' },
+    { color: '#FFF9C4', label: 'Moderate (20-40)', description: 'Moderate danger' },
+    { color: '#FFE0B2', label: 'High (40-60)', description: 'High danger' },
+    { color: '#FFCDD2', label: 'Critical (60+)', description: 'Extremely dangerous' },
+    { color: '#C8E6C9', label: 'Exit', description: 'Evacuation exit' },
   ]
 
   const hazardItems = [
-    { symbol: 'F', label: 'Fire Detected', color: '#FF4444' },
-    { symbol: 'CO', label: 'High CO (>50ppm)', color: '#AA4444' },
-    { symbol: 'O2', label: 'O2 Cylinder Risk', color: '#FF8800' },
-    { symbol: 'C', label: 'High Crowd Density', color: '#FFA500' },
-    { symbol: 'X', label: 'Blocked Exit', color: '#FF0000' },
+    { symbol: 'F', label: 'Fire Detected', color: '#dc2626' },
+    { symbol: 'CO', label: 'High CO (>50ppm)', color: '#991b1b' },
+    { symbol: 'O2', label: 'O2 Cylinder Risk', color: '#d97706' },
+    { symbol: 'C', label: 'High Crowd Density', color: '#ea580c' },
+    { symbol: 'X', label: 'Blocked Exit', color: '#dc2626' },
   ]
 
   return (
@@ -29,7 +29,7 @@ const Legend = () => {
             <div key={idx} className="legend-item">
               <div 
                 className="legend-color" 
-                style={{ backgroundColor: item.color }}
+                style={{ backgroundColor: item.color, border: '1px solid #e5e7eb' }}
               />
               <div className="legend-text">
                 <div className="legend-label">{item.label}</div>
@@ -47,13 +47,13 @@ const Legend = () => {
             <div key={idx} className="legend-item">
               <div className="legend-icon" style={{ 
                 color: item.color,
-                backgroundColor: item.color + '20',
-                border: `1px solid ${item.color}40`,
-                borderRadius: '4px',
+                backgroundColor: '#f9fafb',
+                border: `1px solid ${item.color}`,
+                borderRadius: '3px',
                 padding: '2px 6px',
                 fontSize: '10px',
                 fontWeight: '600',
-                fontFamily: 'monospace'
+                fontFamily: 'Inter, monospace'
               }}>
                 {item.symbol}
               </div>

@@ -26,7 +26,7 @@ const TimeChart = ({ simulationHistory, simulationTime }) => {
                 y1={0}
                 x2={x}
                 y2={chartHeight}
-                stroke="#E0E0E0"
+                stroke="#1f2937"
                 strokeWidth={1}
                 strokeDasharray="2,2"
               />
@@ -41,7 +41,7 @@ const TimeChart = ({ simulationHistory, simulationTime }) => {
               return `${x},${y}`
             }).join(' ')}
             fill="none"
-            stroke="#FF4444"
+            stroke="#dc2626"
             strokeWidth={2}
             className="chart-line"
           />
@@ -54,7 +54,7 @@ const TimeChart = ({ simulationHistory, simulationTime }) => {
               return `${x},${y}`
             }).join(' ')}
             fill="none"
-            stroke="#FF9800"
+            stroke="#d97706"
             strokeWidth={2}
             className="chart-line"
           />
@@ -66,7 +66,7 @@ const TimeChart = ({ simulationHistory, simulationTime }) => {
               y1={0}
               x2={(simulationTime / 120) * chartWidth}
               y2={chartHeight}
-              stroke="#2196F3"
+              stroke="#374151"
               strokeWidth={2}
               className="current-time-indicator"
             />
@@ -75,11 +75,11 @@ const TimeChart = ({ simulationHistory, simulationTime }) => {
         
         <div className="chart-legend">
           <div className="legend-item">
-            <span className="legend-color" style={{ backgroundColor: '#FF4444' }} />
+            <span className="legend-color" style={{ backgroundColor: '#dc2626' }} />
             <span>Fire Count</span>
           </div>
           <div className="legend-item">
-            <span className="legend-color" style={{ backgroundColor: '#FF9800' }} />
+            <span className="legend-color" style={{ backgroundColor: '#d97706' }} />
             <span>Avg Danger</span>
           </div>
         </div>
