@@ -1,20 +1,27 @@
 .legend-panel {
-  background: white;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: #111827;
+  border-radius: 0;
+  padding: 24px;
+  margin-bottom: 0;
+  box-shadow: none;
+  border: 1px solid #1f2937;
 }
 
 .legend-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 0 16px 0;
-  color: #1e3c72;
+  font-size: 11px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  color: #9ca3af;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-family: 'Inter', -apple-system, sans-serif;
 }
 
 .legend-section {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .legend-section:last-child {
@@ -22,39 +29,48 @@
 }
 
 .legend-section-title {
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 600;
-  color: #666;
+  color: #9ca3af;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 8px 0;
+  letter-spacing: 0.05em;
+  margin: 0 0 12px 0;
+  font-family: 'Inter', -apple-system, sans-serif;
 }
 
 .legend-items {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .legend-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+  padding: 0;
 }
 
 .legend-color {
   width: 24px;
-  height: 24px;
-  border-radius: 4px;
-  border: 1px solid #ddd;
+  height: 16px;
+  border-radius: 3px;
+  border: 1px solid #1f2937;
   flex-shrink: 0;
+  box-shadow: none;
 }
 
 .legend-icon {
-  font-size: 20px;
+  font-size: 12px;
   width: 24px;
   text-align: center;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: #e5e7eb;
 }
 
 .legend-text {
@@ -64,29 +80,29 @@
 .legend-label {
   font-size: 12px;
   font-weight: 500;
-  color: #333;
-  line-height: 1.3;
+  color: #e5e7eb;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
 }
 
 .legend-description {
-  font-size: 10px;
-  color: #888;
+  font-size: 11px;
+  color: #9ca3af;
   margin-top: 2px;
 }
 
 .legend-route {
   width: 40px;
-  height: 4px;
+  height: 3px;
   border-radius: 2px;
   flex-shrink: 0;
+  box-shadow: none;
 }
 
 .legend-route.recommended {
-  background: #00FF00;
-  box-shadow: 0 0 4px rgba(0, 255, 0, 0.5);
+  background: #10b981;
 }
 
 .legend-route.alternative {
-  background: #4488FF;
+  background: #6b7280;
 }
-

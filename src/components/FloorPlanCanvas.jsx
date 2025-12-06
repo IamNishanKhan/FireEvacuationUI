@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useState } from 'react'
 import { calculateDangerScore } from '../utils/simulation'
 import './FloorPlanCanvas.css'
 
@@ -59,27 +59,137 @@ const drawRoundedRect = (ctx, x, y, w, h, radius) => {
 
 const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, routeChanged, settings, evacuationProgress = 0 }) => {
   const canvasRef = useRef(null)
+  const containerRef = useRef(null)
   const MAP_WIDTH = 1000
   const MAP_HEIGHT = 900
+  
+  // Pan and zoom state
+  const [zoom, setZoom] = useState(1.0)
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const [isPanning, setIsPanning] = useState(false)
+  const panStartRef = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 })
+  
+  // Pan and zoom event handlers
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    
+    const handleWheel = (e) => {
+      e.preventDefault()
+      const delta = e.deltaY > 0 ? 0.9 : 1.1
+      const newZoom = Math.max(0.5, Math.min(3.0, zoom * delta))
+      
+      // Zoom towards mouse position
+      const rect = container.getBoundingClientRect()
+      const mouseX = e.clientX - rect.left
+      const mouseY = e.clientY - rect.top
+      
+      // Calculate zoom point in canvas coordinates
+      const zoomPointX = (mouseX - pan.x) / zoom
+      const zoomPointY = (mouseY - pan.y) / zoom
+      
+      // Adjust pan to keep zoom point under mouse
+      const newPanX = mouseX - zoomPointX * newZoom
+      const newPanY = mouseY - zoomPointY * newZoom
+      
+      setZoom(newZoom)
+      setPan({ x: newPanX, y: newPanY })
+    }
+    
+    const handleMouseDown = (e) => {
+      if (e.button === 0) { // Left mouse button
+        setIsPanning(true)
+        const rect = container.getBoundingClientRect()
+        panStartRef.current = {
+          mouseX: e.clientX - rect.left,
+          mouseY: e.clientY - rect.top,
+          panX: pan.x,
+          panY: pan.y
+        }
+        container.style.cursor = 'grabbing'
+      }
+    }
+    
+    const handleMouseMove = (e) => {
+      if (isPanning) {
+        const rect = container.getBoundingClientRect()
+        const mouseX = e.clientX - rect.left
+        const mouseY = e.clientY - rect.top
+        const deltaX = mouseX - panStartRef.current.mouseX
+        const deltaY = mouseY - panStartRef.current.mouseY
+        setPan({
+          x: panStartRef.current.panX + deltaX,
+          y: panStartRef.current.panY + deltaY
+        })
+      }
+    }
+    
+    const handleMouseUp = () => {
+      setIsPanning(false)
+      container.style.cursor = 'grab'
+    }
+    
+    const handleMouseLeave = () => {
+      setIsPanning(false)
+      container.style.cursor = 'grab'
+    }
+    
+    container.addEventListener('wheel', handleWheel, { passive: false })
+    container.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+    container.addEventListener('mouseleave', handleMouseLeave)
+    
+    return () => {
+      container.removeEventListener('wheel', handleWheel)
+      container.removeEventListener('mousedown', handleMouseDown)
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+      container.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [zoom, pan, isPanning])
   
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     
     const ctx = canvas.getContext('2d')
-    ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+    // Improve sharpness on high-DPI screens by matching devicePixelRatio
+    const dpr = window.devicePixelRatio || 1
+    const displayWidth = MAP_WIDTH
+    const displayHeight = MAP_HEIGHT
+
+    if (canvas.width !== displayWidth * dpr || canvas.height !== displayHeight * dpr) {
+      canvas.width = displayWidth * dpr
+      canvas.height = displayHeight * dpr
+      canvas.style.width = `${displayWidth}px`
+      canvas.style.height = `${displayHeight}px`
+    }
+
+    // Reset transform then scale so all drawing uses logical coordinates
+    // Apply DPR, then zoom and pan transforms
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.clearRect(0, 0, displayWidth, displayHeight)
     
-    // Calculate scale
+    // Apply zoom and pan transforms
+    ctx.save()
+    ctx.translate(pan.x, pan.y)
+    ctx.scale(zoom, zoom)
+    
+    // Calculate scale so the floorplan fills the canvas with minimal padding
     const allPositions = rooms.map(r => r.position)
     const maxX = Math.max(...allPositions.map(p => p[0]))
     const maxY = Math.max(...allPositions.map(p => p[1]))
-    const scaleX = (MAP_WIDTH - 100) / (maxX + 20)
-    const scaleY = (MAP_HEIGHT - 100) / (maxY + 20)
+    const paddingTopBottom = 10  // small visual padding only on top/bottom
+    const paddingLeftRight = 0   // no padding on left/right as requested
+    const scaleX = (MAP_WIDTH - paddingLeftRight * 2) / (maxX + 10)
+    const scaleY = (MAP_HEIGHT - paddingTopBottom * 2) / (maxY + 10)
     const scale = Math.min(scaleX, scaleY, 8)
-    const offsetX = 50
-    const offsetY = 50
+    const offsetX = paddingLeftRight
+    const offsetY = paddingTopBottom
     
-    // Draw connections with better styling
+    // Draw connections with better styling (base layer)
     connections.forEach(([id1, id2]) => {
       const room1 = rooms.find(r => r.id === id1)
       const room2 = rooms.find(r => r.id === id2)
@@ -106,206 +216,7 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
       }
     })
     
-    // Draw non-recommended routes with modern styling
-    const routeColors = ['#448AFF', '#7B1FA2', '#8D6E63', '#FF6D00', '#64B5F6']
-    routes.forEach((route, idx) => {
-      const isRec = recommended && recommended.path === route.path
-      if (!isRec && route.path.length > 1) {
-        ctx.save()
-        const routeColor = routeColors[idx % routeColors.length]
-        ctx.strokeStyle = routeColor
-        ctx.lineWidth = 3
-        ctx.shadowColor = routeColor + '40'
-        ctx.shadowBlur = 4
-        ctx.lineCap = 'round'
-        ctx.lineJoin = 'round'
-        ctx.beginPath()
-        route.path.forEach((roomId, i) => {
-          const room = rooms.find(r => r.id === roomId)
-          if (room) {
-            const x = room.position[0] * scale + offsetX
-            const y = room.position[1] * scale + offsetY
-            if (i === 0) ctx.moveTo(x, y)
-            else ctx.lineTo(x, y)
-          }
-        })
-        ctx.stroke()
-        ctx.restore()
-      }
-    })
-    
-    // Draw recommended route with beautiful styling
-    if (recommended && recommended.path.length > 1) {
-      ctx.save()
-      
-      // Flash effect if route changed
-      if (routeChanged) {
-        ctx.strokeStyle = '#FFD600'
-        ctx.lineWidth = 8
-        ctx.shadowColor = 'rgba(255, 214, 0, 0.6)'
-        ctx.shadowBlur = 8
-        ctx.lineCap = 'round'
-        ctx.lineJoin = 'round'
-        ctx.beginPath()
-        recommended.path.forEach((roomId, i) => {
-          const room = rooms.find(r => r.id === roomId)
-          if (room) {
-            const x = room.position[0] * scale + offsetX
-            const y = room.position[1] * scale + offsetY
-            if (i === 0) ctx.moveTo(x, y)
-            else ctx.lineTo(x, y)
-          }
-        })
-        ctx.stroke()
-      }
-      
-      // Main recommended route line with gradient effect
-      ctx.strokeStyle = '#00C853'
-      ctx.lineWidth = 6
-      ctx.shadowColor = 'rgba(0, 200, 83, 0.5)'
-      ctx.shadowBlur = 6
-      ctx.lineCap = 'round'
-      ctx.lineJoin = 'round'
-      ctx.beginPath()
-      recommended.path.forEach((roomId, i) => {
-        const room = rooms.find(r => r.id === roomId)
-        if (room) {
-          const x = room.position[0] * scale + offsetX
-          const y = room.position[1] * scale + offsetY
-          if (i === 0) ctx.moveTo(x, y)
-          else ctx.lineTo(x, y)
-        }
-      })
-      ctx.stroke()
-      
-      // Draw beautiful arrow markers
-      recommended.path.forEach((roomId, i) => {
-        if (i < recommended.path.length - 1) {
-          const room1 = rooms.find(r => r.id === roomId)
-          const room2 = rooms.find(r => r.id === recommended.path[i + 1])
-          if (room1 && room2) {
-            const x1 = room1.position[0] * scale + offsetX
-            const y1 = room1.position[1] * scale + offsetY
-            const x2 = room2.position[0] * scale + offsetX
-            const y2 = room2.position[1] * scale + offsetY
-            const midX = (x1 + x2) / 2
-            const midY = (y1 + y2) / 2
-            
-            // Outer glow circle
-            ctx.fillStyle = '#00C853'
-            ctx.shadowColor = 'rgba(0, 200, 83, 0.6)'
-            ctx.shadowBlur = 8
-            ctx.beginPath()
-            ctx.arc(midX, midY, 14, 0, Math.PI * 2)
-            ctx.fill()
-            
-            // Inner white circle
-            ctx.shadowBlur = 0
-            ctx.fillStyle = '#FFFFFF'
-            ctx.beginPath()
-            ctx.arc(midX, midY, 8, 0, Math.PI * 2)
-            ctx.fill()
-            
-            // Arrow icon
-            ctx.fillStyle = '#00C853'
-            ctx.font = 'bold 12px Arial, sans-serif'
-            ctx.textAlign = 'center'
-            ctx.textBaseline = 'middle'
-            ctx.fillText('→', midX, midY)
-          }
-        }
-      })
-      
-      ctx.restore()
-    }
-    
-    // Draw evacuation indicator moving along recommended route
-    if (recommended && recommended.path && recommended.path.length > 1 && evacuationProgress > 0) {
-      ctx.save()
-      
-      const totalSegments = recommended.path.length - 1
-      const currentSegment = Math.floor(evacuationProgress * totalSegments)
-      const segmentProgress = (evacuationProgress * totalSegments) % 1
-      
-      if (currentSegment < totalSegments) {
-        const room1Id = recommended.path[currentSegment]
-        const room2Id = recommended.path[currentSegment + 1]
-        const room1 = rooms.find(r => r.id === room1Id)
-        const room2 = rooms.find(r => r.id === room2Id)
-        
-        if (room1 && room2) {
-          const x1 = room1.position[0] * scale + offsetX
-          const y1 = room1.position[1] * scale + offsetY
-          const x2 = room2.position[0] * scale + offsetX
-          const y2 = room2.position[1] * scale + offsetY
-          
-          // Interpolate position along the segment
-          const currentX = x1 + (x2 - x1) * segmentProgress
-          const currentY = y1 + (y2 - y1) * segmentProgress
-          
-          // Draw animated evacuation indicator (person/icon)
-          // Outer glow
-          ctx.shadowColor = 'rgba(0, 200, 83, 0.8)'
-          ctx.shadowBlur = 12
-          ctx.fillStyle = '#00C853'
-          ctx.beginPath()
-          ctx.arc(currentX, currentY, 16, 0, Math.PI * 2)
-          ctx.fill()
-          
-          // Inner circle
-          ctx.shadowBlur = 0
-          ctx.fillStyle = '#FFFFFF'
-          ctx.beginPath()
-          ctx.arc(currentX, currentY, 12, 0, Math.PI * 2)
-          ctx.fill()
-          
-          // Person icon (simple stick figure)
-          ctx.strokeStyle = '#00C853'
-          ctx.lineWidth = 2.5
-          ctx.lineCap = 'round'
-          
-          // Head
-          ctx.beginPath()
-          ctx.arc(currentX, currentY - 4, 3, 0, Math.PI * 2)
-          ctx.stroke()
-          
-          // Body
-          ctx.beginPath()
-          ctx.moveTo(currentX, currentY - 1)
-          ctx.lineTo(currentX, currentY + 5)
-          ctx.stroke()
-          
-          // Arms
-          ctx.beginPath()
-          ctx.moveTo(currentX - 3, currentY + 1)
-          ctx.lineTo(currentX + 3, currentY + 1)
-          ctx.stroke()
-          
-          // Legs
-          ctx.beginPath()
-          ctx.moveTo(currentX, currentY + 5)
-          ctx.lineTo(currentX - 3, currentY + 8)
-          ctx.moveTo(currentX, currentY + 5)
-          ctx.lineTo(currentX + 3, currentY + 8)
-          ctx.stroke()
-          
-          // Progress indicator trail
-          if (segmentProgress > 0.1) {
-            ctx.strokeStyle = 'rgba(0, 200, 83, 0.3)'
-            ctx.lineWidth = 4
-            ctx.lineCap = 'round'
-            ctx.beginPath()
-            ctx.moveTo(x1, y1)
-            ctx.lineTo(currentX, currentY)
-            ctx.stroke()
-          }
-        }
-      }
-      
-      ctx.restore()
-    }
-    
-    // Draw rooms with beautiful styling
+    // Draw rooms and hazard badges (second layer)
     rooms.forEach(room => {
       const sensor = sensors[room.id] || {}
       const danger = sensor.dangerScore !== undefined ? sensor.dangerScore : calculateDangerScore(sensor)
@@ -458,15 +369,18 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         ctx.restore()
       }
       
-      // Fire indicator with icon style
-      if (sensor.fireDetected) {
+      // Fire indicator with icon style (skip exits to avoid clutter on exit tiles)
+      if (sensor.fireDetected && room.type !== 'exit') {
         ctx.save()
-        const fireX = screenX + w / 2 - 22
-        const fireY = screenY + h / 2 - 22
+        // Position near top-center, slightly outside the main room body
+        const fireWidth = 44
+        const fireHeight = 20
+        const fireX = screenX + w / 2 - fireWidth / 2
+        const fireY = screenY - fireHeight - 4
         
         // Fire badge background
         ctx.fillStyle = '#E53935'
-        drawRoundedRect(ctx, fireX, fireY, 44, 20, 10)
+        drawRoundedRect(ctx, fireX, fireY, fireWidth, fireHeight, 10)
         ctx.fill()
         
         // Fire badge border
@@ -481,18 +395,21 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         ctx.textBaseline = 'middle'
         ctx.shadowColor = 'rgba(0, 0, 0, 0.5)'
         ctx.shadowBlur = 2
-        ctx.fillText('FIRE', screenX + w / 2, fireY + 10)
+        ctx.fillText('FIRE', screenX + w / 2, fireY + fireHeight / 2)
         ctx.restore()
       }
       
       // Oxygen cylinder warning with modern badge
       if (room.hasOxygenCylinder && room.type !== 'exit') {
         ctx.save()
-        const o2X = screenX + w / 2 + w / 3 - 18
-        const o2Y = screenY + h / 2 - 20
+        const badgeWidth = 36
+        const badgeHeight = 18
+        // Top-right outside the room
+        const o2X = screenX + w - badgeWidth + 4
+        const o2Y = screenY - badgeHeight - 2
         
         ctx.fillStyle = '#FFD600'
-        drawRoundedRect(ctx, o2X, o2Y, 36, 18, 9)
+        drawRoundedRect(ctx, o2X, o2Y, badgeWidth, badgeHeight, 9)
         ctx.fill()
         
         ctx.strokeStyle = '#F57F17'
@@ -503,18 +420,21 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         ctx.font = 'bold 10px Arial, sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
-        ctx.fillText('O2', screenX + w / 2 + w / 3, o2Y + 9)
+        ctx.fillText('O2', o2X + badgeWidth / 2, o2Y + badgeHeight / 2)
         ctx.restore()
       }
       
       // CO warning with modern badge
       if (sensor.carbonMonoxide > 50 && room.type !== 'exit') {
         ctx.save()
-        const coX = screenX + w / 2 - w / 3 - 18
-        const coY = screenY + h / 2 - 20
+        const badgeWidth = 36
+        const badgeHeight = 18
+        // Left side, vertically centered outside the room to avoid FIRE badge
+        const coX = screenX - badgeWidth - 6
+        const coY = screenY + h / 2 - badgeHeight / 2
         
         ctx.fillStyle = '#C62828'
-        drawRoundedRect(ctx, coX, coY, 36, 18, 9)
+        drawRoundedRect(ctx, coX, coY, badgeWidth, badgeHeight, 9)
         ctx.fill()
         
         ctx.strokeStyle = '#B71C1C'
@@ -527,18 +447,21 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         ctx.textBaseline = 'middle'
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'
         ctx.shadowBlur = 1
-        ctx.fillText('CO!', screenX + w / 2 - w / 3, coY + 9)
+        ctx.fillText('CO!', coX + badgeWidth / 2, coY + badgeHeight / 2)
         ctx.restore()
       }
       
       // Crowd density indicator
       if (sensor.occupancyDensity > 0.7 && room.type !== 'exit') {
         ctx.save()
-        const crowdX = screenX + w / 2 - 28
-        const crowdY = screenY + h / 2 + 22
+        const badgeWidth = 56
+        const badgeHeight = 16
+        // Bottom-center outside the room
+        const crowdX = screenX + w / 2 - badgeWidth / 2
+        const crowdY = screenY + h + 4
         
         ctx.fillStyle = '#FF6D00'
-        drawRoundedRect(ctx, crowdX, crowdY, 56, 16, 8)
+        drawRoundedRect(ctx, crowdX, crowdY, badgeWidth, badgeHeight, 8)
         ctx.fill()
         
         ctx.strokeStyle = '#E65100'
@@ -551,7 +474,7 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         ctx.textBaseline = 'middle'
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)'
         ctx.shadowBlur = 1
-        ctx.fillText('CROWD', screenX + w / 2, crowdY + 8)
+        ctx.fillText('CROWD', crowdX + badgeWidth / 2, crowdY + badgeHeight / 2)
         ctx.restore()
       }
       
@@ -587,12 +510,214 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
       }
     })
     
-    // Draw route labels with modern badges
+    // After rooms are drawn, render routes and indicators on top for maximum clarity
+    
+    // Draw non-recommended routes with modern styling (third layer)
+    const routeColors = ['#448AFF', '#7B1FA2', '#8D6E63', '#FF6D00', '#64B5F6']
+    routes.forEach((route, idx) => {
+      const isRec = recommended && recommended.path === route.path
+      if (!isRec && route.path.length > 1) {
+        ctx.save()
+        const routeColor = routeColors[idx % routeColors.length]
+        ctx.strokeStyle = routeColor
+        ctx.lineWidth = 3
+        ctx.shadowColor = routeColor + '40'
+        ctx.shadowBlur = 4
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.beginPath()
+        route.path.forEach((roomId, i) => {
+          const room = rooms.find(r => r.id === roomId)
+          if (room) {
+            const x = room.position[0] * scale + offsetX
+            const y = room.position[1] * scale + offsetY
+            if (i === 0) ctx.moveTo(x, y)
+            else ctx.lineTo(x, y)
+          }
+        })
+        ctx.stroke()
+        ctx.restore()
+      }
+    })
+    
+    // Draw recommended route with beautiful styling (fourth layer)
+    if (recommended && recommended.path.length > 1) {
+      ctx.save()
+      
+      // Flash effect if route changed
+      if (routeChanged) {
+        ctx.strokeStyle = '#FFD600'
+        ctx.lineWidth = 8
+        ctx.shadowColor = 'rgba(255, 214, 0, 0.6)'
+        ctx.shadowBlur = 8
+        ctx.lineCap = 'round'
+        ctx.lineJoin = 'round'
+        ctx.beginPath()
+        recommended.path.forEach((roomId, i) => {
+          const room = rooms.find(r => r.id === roomId)
+          if (room) {
+            const x = room.position[0] * scale + offsetX
+            const y = room.position[1] * scale + offsetY
+            if (i === 0) ctx.moveTo(x, y)
+            else ctx.lineTo(x, y)
+          }
+        })
+        ctx.stroke()
+      }
+      
+      // Main recommended route line with gradient effect
+      ctx.strokeStyle = '#00C853'
+      ctx.lineWidth = 6
+      ctx.shadowColor = 'rgba(0, 200, 83, 0.5)'
+      ctx.shadowBlur = 6
+      ctx.lineCap = 'round'
+      ctx.lineJoin = 'round'
+      ctx.beginPath()
+      recommended.path.forEach((roomId, i) => {
+        const room = rooms.find(r => r.id === roomId)
+        if (room) {
+          const x = room.position[0] * scale + offsetX
+          const y = room.position[1] * scale + offsetY
+          if (i === 0) ctx.moveTo(x, y)
+          else ctx.lineTo(x, y)
+        }
+      })
+      ctx.stroke()
+      
+      // Draw beautiful arrow markers
+      recommended.path.forEach((roomId, i) => {
+        if (i < recommended.path.length - 1) {
+          const room1 = rooms.find(r => r.id === roomId)
+          const room2 = rooms.find(r => r.id === recommended.path[i + 1])
+          if (room1 && room2) {
+            const x1 = room1.position[0] * scale + offsetX
+            const y1 = room1.position[1] * scale + offsetY
+            const x2 = room2.position[0] * scale + offsetX
+            const y2 = room2.position[1] * scale + offsetY
+            const midX = (x1 + x2) / 2
+            const midY = (y1 + y2) / 2
+            
+            // Outer glow circle
+            ctx.fillStyle = '#00C853'
+            ctx.shadowColor = 'rgba(0, 200, 83, 0.6)'
+            ctx.shadowBlur = 8
+            ctx.beginPath()
+            ctx.arc(midX, midY, 14, 0, Math.PI * 2)
+            ctx.fill()
+            
+            // Inner white circle
+            ctx.shadowBlur = 0
+            ctx.fillStyle = '#FFFFFF'
+            ctx.beginPath()
+            ctx.arc(midX, midY, 8, 0, Math.PI * 2)
+            ctx.fill()
+            
+            // Arrow icon
+            ctx.fillStyle = '#00C853'
+            ctx.font = 'bold 12px Arial, sans-serif'
+            ctx.textAlign = 'center'
+            ctx.textBaseline = 'middle'
+            ctx.fillText('→', midX, midY)
+          }
+        }
+      })
+      
+      ctx.restore()
+    }
+    
+    // Draw evacuation indicator moving along recommended route (top-most for the path)
+    if (recommended && recommended.path && recommended.path.length > 1 && evacuationProgress > 0) {
+      ctx.save()
+      
+      const totalSegments = recommended.path.length - 1
+      const currentSegment = Math.floor(evacuationProgress * totalSegments)
+      const segmentProgress = (evacuationProgress * totalSegments) % 1
+      
+      if (currentSegment < totalSegments) {
+        const room1Id = recommended.path[currentSegment]
+        const room2Id = recommended.path[currentSegment + 1]
+        const room1 = rooms.find(r => r.id === room1Id)
+        const room2 = rooms.find(r => r.id === room2Id)
+        
+        if (room1 && room2) {
+          const x1 = room1.position[0] * scale + offsetX
+          const y1 = room1.position[1] * scale + offsetY
+          const x2 = room2.position[0] * scale + offsetX
+          const y2 = room2.position[1] * scale + offsetY
+          
+          // Interpolate position along the segment
+          const currentX = x1 + (x2 - x1) * segmentProgress
+          const currentY = y1 + (y2 - y1) * segmentProgress
+          
+          // Draw animated evacuation indicator (person/icon)
+          // Outer glow
+          ctx.shadowColor = 'rgba(0, 200, 83, 0.8)'
+          ctx.shadowBlur = 12
+          ctx.fillStyle = '#00C853'
+          ctx.beginPath()
+          ctx.arc(currentX, currentY, 16, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Inner circle
+          ctx.shadowBlur = 0
+          ctx.fillStyle = '#FFFFFF'
+          ctx.beginPath()
+          ctx.arc(currentX, currentY, 12, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Person icon (simple stick figure)
+          ctx.strokeStyle = '#00C853'
+          ctx.lineWidth = 2.5
+          ctx.lineCap = 'round'
+          
+          // Head
+          ctx.beginPath()
+          ctx.arc(currentX, currentY - 4, 3, 0, Math.PI * 2)
+          ctx.stroke()
+          
+          // Body
+          ctx.beginPath()
+          ctx.moveTo(currentX, currentY - 1)
+          ctx.lineTo(currentX, currentY + 5)
+          ctx.stroke()
+          
+          // Arms
+          ctx.beginPath()
+          ctx.moveTo(currentX - 3, currentY + 1)
+          ctx.lineTo(currentX + 3, currentY + 1)
+          ctx.stroke()
+          
+          // Legs
+          ctx.beginPath()
+          ctx.moveTo(currentX, currentY + 5)
+          ctx.lineTo(currentX - 3, currentY + 8)
+          ctx.moveTo(currentX, currentY + 5)
+          ctx.lineTo(currentX + 3, currentY + 8)
+          ctx.stroke()
+          
+          // Progress indicator trail
+          if (segmentProgress > 0.1) {
+            ctx.strokeStyle = 'rgba(0, 200, 83, 0.3)'
+            ctx.lineWidth = 4
+            ctx.lineCap = 'round'
+            ctx.beginPath()
+            ctx.moveTo(x1, y1)
+            ctx.lineTo(currentX, currentY)
+            ctx.stroke()
+          }
+        }
+      }
+      
+      ctx.restore()
+    }
+    
+    // Finally, draw route labels with modern badges
     routes.forEach((route, idx) => {
       const endRoom = rooms.find(r => r.id === route.path[route.path.length - 1])
       if (endRoom) {
         const x = endRoom.position[0] * scale + offsetX
-        const y = endRoom.position[1] * scale + offsetY - 30
+        // Lift labels higher above the exit to avoid overlapping important tiles
+        const y = endRoom.position[1] * scale + offsetY - 50
         
         const isRec = recommended && recommended.path === route.path
         const labelColor = isRec ? '#00C853' : routeColors[idx % routeColors.length]
@@ -600,12 +725,21 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         
         ctx.save()
         
+        // Measure text to size badge dynamically
+        ctx.font = isRec ? 'bold 12px Arial, sans-serif' : '600 11px Arial, sans-serif'
+        const textMetrics = ctx.measureText(label)
+        const paddingX = 12
+        const badgeWidth = textMetrics.width + paddingX * 2
+        const badgeHeight = 24
+        const badgeX = x - badgeWidth / 2
+        const badgeY = y - badgeHeight / 2
+
         // Badge background with shadow
         ctx.shadowColor = 'rgba(0, 0, 0, 0.2)'
         ctx.shadowBlur = 4
         ctx.shadowOffsetY = 2
         ctx.fillStyle = '#FFFFFF'
-        drawRoundedRect(ctx, x - 70, y - 12, 140, 24, 12)
+        drawRoundedRect(ctx, badgeX, badgeY, badgeWidth, badgeHeight, 12)
         ctx.fill()
         
         // Badge border
@@ -616,7 +750,6 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         
         // Badge text
         ctx.fillStyle = labelColor
-        ctx.font = isRec ? 'bold 12px Arial, sans-serif' : '600 11px Arial, sans-serif'
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
         ctx.shadowColor = 'rgba(0, 0, 0, 0.1)'
@@ -626,10 +759,17 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
         ctx.restore()
       }
     })
-  }, [rooms, connections, sensors, routes, recommended, routeChanged, settings, evacuationProgress])
+    
+    // Restore transform after all drawing
+    ctx.restore()
+  }, [rooms, connections, sensors, routes, recommended, routeChanged, settings, evacuationProgress, zoom, pan])
   
   return (
-    <div className="canvas-container">
+    <div 
+      ref={containerRef}
+      className="canvas-container"
+      style={{ cursor: isPanning ? 'grabbing' : 'grab' }}
+    >
       <canvas
         ref={canvasRef}
         width={MAP_WIDTH}
