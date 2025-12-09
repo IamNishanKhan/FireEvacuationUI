@@ -14,6 +14,10 @@
   left: 0;
   right: 0;
   backdrop-filter: blur(10px);
+  /* iOS safe area support */
+  padding-top: env(safe-area-inset-top);
+  padding-left: calc(24px + env(safe-area-inset-left));
+  padding-right: calc(24px + env(safe-area-inset-right));
 }
 
 .header-left {
@@ -445,5 +449,322 @@
   
   .control-divider {
     display: none;
+  }
+}
+
+/* Tablet Portrait (768px - 1024px) */
+@media (max-width: 1024px) {
+  .app-header {
+    height: 64px;
+    padding: 0 16px;
+  }
+
+  .header-left {
+    min-width: 180px;
+  }
+
+  .logo-text h1 {
+    font-size: 14px;
+  }
+
+  .status-indicators {
+    padding: 6px 8px;
+  }
+
+  .status-item {
+    padding: 0 6px;
+  }
+
+  .status-value {
+    font-size: 13px;
+  }
+
+  .status-label {
+    font-size: 8px;
+  }
+
+  .time-progress-bar {
+    width: 70px;
+  }
+
+  .speed-btn {
+    padding: 3px 5px;
+    font-size: 8px;
+    min-width: 26px;
+  }
+
+  .control-btn {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+}
+
+/* Mobile Landscape & Small Tablets (640px - 768px) */
+@media (max-width: 768px) {
+  .app-header {
+    height: 60px;
+    padding: 0 12px;
+    flex-wrap: wrap;
+  }
+
+  .header-left {
+    min-width: 150px;
+    flex: 0 0 auto;
+  }
+
+  .logo-icon-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+
+  .logo-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .logo-text h1 {
+    font-size: 13px;
+  }
+
+  .header-center {
+    flex: 1 1 auto;
+    min-width: 0;
+    padding: 0 8px;
+    order: 3;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  .status-indicators {
+    padding: 4px 6px;
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .status-item {
+    padding: 0 4px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .status-value {
+    font-size: 12px;
+  }
+
+  .status-label {
+    font-size: 7px;
+  }
+
+  .status-divider {
+    height: 24px;
+    margin: 0 2px;
+  }
+
+  .time-progress-bar {
+    width: 50px;
+    height: 3px;
+  }
+
+  .speed-selector {
+    gap: 2px;
+    padding: 1px;
+  }
+
+  .speed-btn {
+    padding: 2px 4px;
+    font-size: 7px;
+    min-width: 24px;
+  }
+
+  .header-right {
+    flex: 0 0 auto;
+    order: 2;
+  }
+
+  .header-controls {
+    gap: 4px;
+  }
+
+  .control-btn {
+    padding: 6px 8px;
+    font-size: 10px;
+    min-width: 40px;
+  }
+
+  .btn-icon {
+    font-size: 11px;
+  }
+}
+
+/* Mobile Portrait (480px - 640px) */
+@media (max-width: 640px) {
+  .app-header {
+    height: 56px;
+    padding: 0 8px;
+  }
+
+  .header-left {
+    min-width: 120px;
+  }
+
+  .logo-icon-wrapper {
+    width: 28px;
+    height: 28px;
+  }
+
+  .logo-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  .logo-text h1 {
+    font-size: 12px;
+  }
+
+  .header-center {
+    padding: 0 4px;
+    margin-top: 2px;
+  }
+
+  .status-indicators {
+    padding: 3px 4px;
+    gap: 0;
+  }
+
+  .status-item {
+    padding: 0 3px;
+  }
+
+  .status-value {
+    font-size: 11px;
+  }
+
+  .status-label {
+    font-size: 6px;
+    display: none; /* Hide labels on very small screens */
+  }
+
+  .status-divider {
+    height: 20px;
+    margin: 0 1px;
+  }
+
+  .time-progress-bar {
+    width: 40px;
+    height: 2px;
+  }
+
+  .speed-btn {
+    padding: 2px 3px;
+    font-size: 6px;
+    min-width: 20px;
+  }
+
+  .header-controls {
+    gap: 3px;
+  }
+
+  .control-btn {
+    padding: 5px 6px;
+    font-size: 9px;
+    min-width: 36px;
+  }
+
+  .btn-icon {
+    font-size: 10px;
+  }
+
+  .control-divider {
+    display: none;
+  }
+}
+
+/* Small Mobile Devices (320px - 480px) */
+@media (max-width: 480px) {
+  .app-header {
+    height: 52px;
+    padding: 0 6px;
+  }
+
+  .header-left {
+    min-width: 100px;
+  }
+
+  .logo-text h1 {
+    font-size: 11px;
+  }
+
+  .status-value {
+    font-size: 10px;
+  }
+
+  .time-progress-bar {
+    width: 35px;
+  }
+
+  .speed-btn {
+    min-width: 18px;
+    padding: 2px;
+    font-size: 5px;
+  }
+
+  .control-btn {
+    padding: 4px 5px;
+    font-size: 8px;
+    min-width: 32px;
+  }
+
+  .btn-icon {
+    font-size: 9px;
+  }
+}
+
+/* Landscape Orientation on Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .app-header {
+    height: 50px;
+  }
+
+  .header-center {
+    order: 2;
+    width: auto;
+    margin-top: 0;
+    flex: 1;
+  }
+
+  .header-right {
+    order: 3;
+  }
+
+  .status-indicators {
+    width: auto;
+  }
+
+  .status-label {
+    display: block;
+    font-size: 7px;
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .control-btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 8px 12px;
+  }
+
+  .speed-btn {
+    min-height: 32px;
+    min-width: 32px;
+  }
+
+  .control-btn:active {
+    transform: scale(0.95);
+    background: rgba(51, 65, 85, 0.9);
+  }
+
+  .speed-btn:active {
+    transform: scale(0.95);
   }
 }

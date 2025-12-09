@@ -172,3 +172,101 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .info-panel {
+    padding: 16px;
+  }
+
+  .panel-title {
+    font-size: 10px;
+  }
+
+  .panel-subtitle {
+    font-size: 12px;
+  }
+
+  .route-info {
+    font-size: 12px;
+  }
+
+  .route-path {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  .route-item {
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .control-item {
+    font-size: 11px;
+    padding: 5px 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .info-panel {
+    padding: 12px;
+  }
+
+  .panel-title {
+    font-size: 9px;
+  }
+
+  .panel-subtitle {
+    font-size: 11px;
+  }
+
+  .section-title {
+    font-size: 9px;
+  }
+
+  .route-info {
+    font-size: 11px;
+  }
+
+  .route-path {
+    font-size: 10px;
+    padding: 6px 8px;
+  }
+
+  .route-item {
+    padding: 8px;
+    font-size: 10px;
+    margin: 6px 0;
+  }
+
+  .control-item {
+    font-size: 10px;
+    padding: 4px 0;
+  }
+
+  .recommended-section,
+  .all-routes-section,
+  .controls-section {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .info-panel {
+    padding: 10px;
+  }
+
+  .panel-section {
+    gap: 12px;
+  }
+
+  .route-path {
+    font-size: 9px;
+    word-break: break-word;
+  }
+
+  .route-item {
+    padding: 6px;
+    font-size: 9px;
+  }
+}

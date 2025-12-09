@@ -91,3 +91,84 @@
   font-variant-numeric: tabular-nums;
   font-family: 'Inter', -apple-system, sans-serif;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .time-chart {
+    padding: 16px;
+  }
+
+  .chart-title {
+    font-size: 10px;
+    margin-bottom: 12px;
+  }
+
+  .chart-container {
+    padding: 12px;
+  }
+
+  .chart-svg {
+    height: 70px;
+  }
+
+  .chart-legend {
+    gap: 16px;
+    margin-top: 10px;
+  }
+
+  .legend-item {
+    font-size: 10px;
+    gap: 6px;
+  }
+
+  .chart-labels {
+    font-size: 9px;
+    margin-top: 6px;
+  }
+}
+
+@media (max-width: 640px) {
+  .time-chart {
+    padding: 12px;
+  }
+
+  .chart-title {
+    font-size: 9px;
+    margin-bottom: 10px;
+  }
+
+  .chart-container {
+    padding: 10px;
+  }
+
+  .chart-svg {
+    height: 60px;
+  }
+
+  .chart-legend {
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .legend-item {
+    font-size: 9px;
+  }
+
+  .chart-labels {
+    font-size: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-chart {
+    padding: 10px;
+  }
+
+  .chart-svg {
+    height: 50px;
+  }
+
+  .chart-labels {
+    font-size: 7px;
+  }
+}

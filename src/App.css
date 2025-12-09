@@ -1,5 +1,6 @@
 :root {
   --header-height: 72px;
+  --header-height-mobile: 60px;
   --content-gap: 0px; /* use 0; add inner padding in scroll area instead */
 }
 
@@ -15,16 +16,28 @@
     radial-gradient(circle at bottom right, #0f172a 0, #020617 55%);
   color: #e5e7eb;
   overflow: hidden;
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
+  position: relative;
+  /* iOS safe area support */
+  padding-top: calc(var(--header-height) + var(--content-gap) + env(safe-area-inset-top));
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .main-container {
   display: flex;
   width: 100%;
-  height: calc(100vh - var(--header-height) - var(--content-gap));
+  height: calc(100vh - var(--header-height) - var(--content-gap) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   overflow: hidden;
   gap: 20px;
   padding: 18px 20px 26px;
   box-sizing: border-box;
+  /* iOS safe area support */
+  padding-left: calc(20px + env(safe-area-inset-left));
+  padding-right: calc(20px + env(safe-area-inset-right));
+  padding-bottom: calc(26px + env(safe-area-inset-bottom));
 }
 
 .canvas-wrapper {
@@ -36,6 +49,9 @@
   box-shadow:
     0 22px 55px rgba(15, 23, 42, 0.65),
     0 0 0 1px rgba(148, 163, 184, 0.35);
+  /* Enable touch scrolling on mobile */
+  touch-action: pan-x pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sidebar {
@@ -51,6 +67,8 @@
   backdrop-filter: none;
   border-left: 1px solid #1f2937;
   box-shadow: -2px 0 12px rgba(0, 0, 0, 0.25);
+  /* Smooth scrolling on mobile */
+  -webkit-overflow-scrolling: touch;
 }
 
 .controls-overlay {
@@ -83,6 +101,8 @@
   z-index: 1001;
   animation: flash-alert 0.5s ease-in-out 3;
   border: 2px solid rgba(255, 255, 255, 0.3);
+  max-width: 90%;
+  box-sizing: border-box;
 }
 
 .alert-text {
@@ -91,9 +111,10 @@
   color: #FFFFFF;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
-/* Responsive tweaks */
+/* Tablet Landscape (1024px - 1200px) */
 @media (max-width: 1200px) {
   .sidebar {
     width: 360px;
@@ -101,38 +122,181 @@
   }
 }
 
-@media (max-width: 992px) {
+/* Tablet Portrait (768px - 1024px) */
+@media (max-width: 1024px) {
+  .main-container {
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .canvas-wrapper {
+    border-radius: 16px;
+  }
+
+  .sidebar {
+    width: 340px;
+    max-width: 38%;
+  }
+}
+
+/* Mobile Landscape & Small Tablets (640px - 768px) */
+@media (max-width: 768px) {
+  :root {
+    --header-height: var(--header-height-mobile);
+  }
+
   .app {
-    padding-top: var(--header-height);
+    padding-top: calc(var(--header-height-mobile) + var(--content-gap));
   }
 
   .main-container {
     flex-direction: column;
-    height: auto;
+    height: calc(100vh - var(--header-height-mobile) - var(--content-gap));
+    gap: 12px;
+    padding: 12px;
   }
 
   .canvas-wrapper {
-    min-height: 380px;
+    min-height: 400px;
+    max-height: 50vh;
+    border-radius: 12px;
+    flex-shrink: 0;
   }
 
   .sidebar {
     width: 100%;
     max-width: 100%;
+    max-height: calc(50vh - 24px);
+    border-left: none;
+    border-top: 1px solid #1f2937;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .route-change-alert {
+    top: 10px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .alert-text {
+    font-size: 14px;
   }
 }
 
+/* Mobile Portrait - iPhone, Samsung (320px - 640px) */
 @media (max-width: 640px) {
   .main-container {
-    padding: 12px;
-    gap: 12px;
+    padding: 8px;
+    gap: 8px;
+    height: calc(100vh - var(--header-height-mobile));
   }
 
   .canvas-wrapper {
-    border-radius: 14px;
+    min-height: 350px;
+    max-height: 45vh;
+    border-radius: 10px;
   }
 
   .sidebar {
+    max-height: calc(55vh - 16px);
     padding: 0;
+  }
+
+  .route-change-alert {
+    top: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    max-width: 95%;
+  }
+
+  .alert-text {
+    font-size: 12px;
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+/* Small Mobile Devices (320px - 480px) */
+@media (max-width: 480px) {
+  .main-container {
+    padding: 6px;
+    gap: 6px;
+  }
+
+  .canvas-wrapper {
+    min-height: 300px;
+    max-height: 40vh;
+    border-radius: 8px;
+  }
+
+  .sidebar {
+    max-height: calc(60vh - 12px);
+  }
+
+  .route-change-alert {
+    padding: 6px 10px;
+    top: 6px;
+  }
+
+  .alert-text {
+    font-size: 11px;
+  }
+}
+
+/* Very Small Devices (320px and below) */
+@media (max-width: 320px) {
+  .canvas-wrapper {
+    min-height: 280px;
+    max-height: 38vh;
+  }
+
+  .sidebar {
+    max-height: calc(62vh - 12px);
+  }
+}
+
+/* Landscape Orientation on Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .main-container {
+    flex-direction: row;
+    height: calc(100vh - var(--header-height-mobile));
+  }
+
+  .canvas-wrapper {
+    max-height: 100%;
+    min-height: auto;
+    flex: 1.2;
+  }
+
+  .sidebar {
+    max-height: 100%;
+    width: 320px;
+    max-width: 40%;
+    border-top: none;
+    border-left: 1px solid #1f2937;
+    box-shadow: -2px 0 12px rgba(0, 0, 0, 0.25);
+  }
+}
+
+/* Touch Device Optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Increase touch target sizes */
+  .control-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text selection on touch */
+  .app {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Better touch scrolling */
+  .sidebar {
+    overscroll-behavior: contain;
   }
 }
 
