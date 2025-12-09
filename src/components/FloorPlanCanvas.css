@@ -9,6 +9,11 @@
   position: relative;
   padding-top: 0; /* remove extra band above the main area */
   user-select: none; /* Prevent text selection while panning */
+  /* Touch optimizations */
+  touch-action: pan-x pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 canvas {
@@ -19,5 +24,29 @@ canvas {
   margin: 0; /* remove outer whitespace around the main area */
   background: #FFFFFF;
   pointer-events: none; /* Let container handle mouse events */
+  /* Prevent image drag on mobile */
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .canvas-container {
+    cursor: grab;
+  }
+
+  .canvas-container:active {
+    cursor: grabbing;
+  }
+}
+
+@media (max-width: 480px) {
+  canvas {
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
 }
 

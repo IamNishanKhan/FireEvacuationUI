@@ -106,3 +106,90 @@
 .legend-route.alternative {
   background: #6b7280;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .legend-panel {
+    padding: 16px;
+  }
+
+  .legend-title {
+    font-size: 10px;
+    margin-bottom: 16px;
+  }
+
+  .legend-section {
+    margin-bottom: 16px;
+  }
+
+  .legend-section-title {
+    font-size: 9px;
+    margin-bottom: 10px;
+  }
+
+  .legend-items {
+    gap: 8px;
+  }
+
+  .legend-item {
+    gap: 10px;
+  }
+
+  .legend-label {
+    font-size: 11px;
+  }
+
+  .legend-description {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .legend-panel {
+    padding: 12px;
+  }
+
+  .legend-title {
+    font-size: 9px;
+    margin-bottom: 12px;
+  }
+
+  .legend-section {
+    margin-bottom: 12px;
+  }
+
+  .legend-section-title {
+    font-size: 8px;
+    margin-bottom: 8px;
+  }
+
+  .legend-items {
+    gap: 6px;
+  }
+
+  .legend-label {
+    font-size: 10px;
+  }
+
+  .legend-description {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .legend-panel {
+    padding: 10px;
+  }
+
+  .legend-items {
+    gap: 5px;
+  }
+
+  .legend-label {
+    font-size: 9px;
+  }
+
+  .legend-description {
+    font-size: 8px;
+  }
+}

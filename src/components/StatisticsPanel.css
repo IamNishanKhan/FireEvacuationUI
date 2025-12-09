@@ -133,3 +133,97 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
+
+/* Mobile Responsive Styles */
+@media (max-width: 768px) {
+  .statistics-panel {
+    padding: 16px;
+  }
+
+  .panel-title {
+    font-size: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stats-grid {
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .stat-card {
+    padding: 12px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .recommended-stats {
+    padding: 12px;
+  }
+
+  .route-stats-grid {
+    gap: 10px;
+  }
+
+  .route-stat-value {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 640px) {
+  .statistics-panel {
+    padding: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 10px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+  }
+
+  .stat-label {
+    font-size: 9px;
+  }
+
+  .route-stat-value {
+    font-size: 12px;
+  }
+
+  .route-stat-label {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-panel {
+    padding: 10px;
+  }
+
+  .stats-grid {
+    gap: 6px;
+  }
+
+  .stat-card {
+    padding: 8px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .stat-label {
+    font-size: 8px;
+  }
+}

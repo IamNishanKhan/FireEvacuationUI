@@ -69,7 +69,16 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
   const [isPanning, setIsPanning] = useState(false)
   const panStartRef = useRef({ mouseX: 0, mouseY: 0, panX: 0, panY: 0 })
   
-  // Pan and zoom event handlers
+  // Touch gesture state
+  const touchStateRef = useRef({
+    touches: [],
+    initialDistance: 0,
+    initialZoom: 1.0,
+    initialPan: { x: 0, y: 0 },
+    center: { x: 0, y: 0 }
+  })
+  
+  // Pan and zoom event handlers (mouse + touch)
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -134,11 +143,119 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
       container.style.cursor = 'grab'
     }
     
+    // Touch event handlers for mobile
+    const getDistance = (touch1, touch2) => {
+      const dx = touch2.clientX - touch1.clientX
+      const dy = touch2.clientY - touch1.clientY
+      return Math.sqrt(dx * dx + dy * dy)
+    }
+    
+    const getCenter = (touch1, touch2) => {
+      const rect = container.getBoundingClientRect()
+      return {
+        x: ((touch1.clientX + touch2.clientX) / 2) - rect.left,
+        y: ((touch1.clientY + touch2.clientY) / 2) - rect.top
+      }
+    }
+    
+    const handleTouchStart = (e) => {
+      e.preventDefault()
+      const touches = Array.from(e.touches)
+      touchStateRef.current.touches = touches
+      
+      if (touches.length === 1) {
+        // Single touch - pan
+        const rect = container.getBoundingClientRect()
+        const touch = touches[0]
+        panStartRef.current = {
+          mouseX: touch.clientX - rect.left,
+          mouseY: touch.clientY - rect.top,
+          panX: pan.x,
+          panY: pan.y
+        }
+        setIsPanning(true)
+      } else if (touches.length === 2) {
+        // Two touches - pinch to zoom
+        setIsPanning(false)
+        const distance = getDistance(touches[0], touches[1])
+        const center = getCenter(touches[0], touches[1])
+        touchStateRef.current.initialDistance = distance
+        touchStateRef.current.initialZoom = zoom
+        touchStateRef.current.initialPan = { ...pan }
+        touchStateRef.current.center = center
+      }
+    }
+    
+    const handleTouchMove = (e) => {
+      e.preventDefault()
+      const touches = Array.from(e.touches)
+      touchStateRef.current.touches = touches
+      
+      if (touches.length === 1 && isPanning) {
+        // Single touch pan
+        const rect = container.getBoundingClientRect()
+        const touch = touches[0]
+        const mouseX = touch.clientX - rect.left
+        const mouseY = touch.clientY - rect.top
+        const deltaX = mouseX - panStartRef.current.mouseX
+        const deltaY = mouseY - panStartRef.current.mouseY
+        setPan({
+          x: panStartRef.current.panX + deltaX,
+          y: panStartRef.current.panY + deltaY
+        })
+      } else if (touches.length === 2) {
+        // Pinch to zoom
+        const distance = getDistance(touches[0], touches[1])
+        const scale = distance / touchStateRef.current.initialDistance
+        const newZoom = Math.max(0.5, Math.min(3.0, touchStateRef.current.initialZoom * scale))
+        
+        // Calculate zoom point in canvas coordinates
+        const center = touchStateRef.current.center
+        const zoomPointX = (center.x - touchStateRef.current.initialPan.x) / touchStateRef.current.initialZoom
+        const zoomPointY = (center.y - touchStateRef.current.initialPan.y) / touchStateRef.current.initialZoom
+        
+        // Adjust pan to keep zoom point under center
+        const newPanX = center.x - zoomPointX * newZoom
+        const newPanY = center.y - zoomPointY * newZoom
+        
+        setZoom(newZoom)
+        setPan({ x: newPanX, y: newPanY })
+      }
+    }
+    
+    const handleTouchEnd = (e) => {
+      e.preventDefault()
+      const touches = Array.from(e.touches)
+      touchStateRef.current.touches = touches
+      
+      if (touches.length === 0) {
+        setIsPanning(false)
+      } else if (touches.length === 1) {
+        // Switch from zoom to pan
+        const rect = container.getBoundingClientRect()
+        const touch = touches[0]
+        panStartRef.current = {
+          mouseX: touch.clientX - rect.left,
+          mouseY: touch.clientY - rect.top,
+          panX: pan.x,
+          panY: pan.y
+        }
+        setIsPanning(true)
+      }
+    }
+    
+    // Mouse events
     container.addEventListener('wheel', handleWheel, { passive: false })
     container.addEventListener('mousedown', handleMouseDown)
     window.addEventListener('mousemove', handleMouseMove)
     window.addEventListener('mouseup', handleMouseUp)
     container.addEventListener('mouseleave', handleMouseLeave)
+    
+    // Touch events
+    container.addEventListener('touchstart', handleTouchStart, { passive: false })
+    container.addEventListener('touchmove', handleTouchMove, { passive: false })
+    container.addEventListener('touchend', handleTouchEnd, { passive: false })
+    container.addEventListener('touchcancel', handleTouchEnd, { passive: false })
     
     return () => {
       container.removeEventListener('wheel', handleWheel)
@@ -146,6 +263,10 @@ const FloorPlanCanvas = ({ rooms, connections, sensors, routes, recommended, rou
       window.removeEventListener('mousemove', handleMouseMove)
       window.removeEventListener('mouseup', handleMouseUp)
       container.removeEventListener('mouseleave', handleMouseLeave)
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+      container.removeEventListener('touchend', handleTouchEnd)
+      container.removeEventListener('touchcancel', handleTouchEnd)
     }
   }, [zoom, pan, isPanning])
   
