@@ -1,6 +1,8 @@
 :root {
   --header-height: 72px;
-  --header-height-mobile: 60px;
+  --header-height-mobile: 56px;
+  --header-height-mobile-small: 52px;
+  --header-height-mobile-xs: 48px;
   --content-gap: 0px; /* use 0; add inner padding in scroll area instead */
 }
 
@@ -146,12 +148,12 @@
   }
 
   .app {
-    padding-top: calc(var(--header-height-mobile) + var(--content-gap));
+    padding-top: calc(var(--header-height-mobile) + var(--content-gap) + env(safe-area-inset-top));
   }
 
   .main-container {
     flex-direction: column;
-    height: calc(100vh - var(--header-height-mobile) - var(--content-gap));
+    height: calc(100vh - var(--header-height-mobile) - var(--content-gap) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
     gap: 12px;
     padding: 12px;
   }
@@ -185,10 +187,18 @@
 
 /* Mobile Portrait - iPhone, Samsung (320px - 640px) */
 @media (max-width: 640px) {
+  :root {
+    --header-height: var(--header-height-mobile-small);
+  }
+
+  .app {
+    padding-top: calc(var(--header-height-mobile-small) + var(--content-gap) + env(safe-area-inset-top));
+  }
+
   .main-container {
     padding: 8px;
     gap: 8px;
-    height: calc(100vh - var(--header-height-mobile));
+    height: calc(100vh - var(--header-height-mobile-small) - var(--content-gap) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 
   .canvas-wrapper {
@@ -218,9 +228,18 @@
 
 /* Small Mobile Devices (320px - 480px) */
 @media (max-width: 480px) {
+  :root {
+    --header-height: var(--header-height-mobile-xs);
+  }
+
+  .app {
+    padding-top: calc(var(--header-height-mobile-xs) + var(--content-gap) + env(safe-area-inset-top));
+  }
+
   .main-container {
     padding: 6px;
     gap: 6px;
+    height: calc(100vh - var(--header-height-mobile-xs) - var(--content-gap) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   }
 
   .canvas-wrapper {
